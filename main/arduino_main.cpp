@@ -19,12 +19,23 @@ limitations under the License.
 #error "Must only be compiled when using Bluepad32 Arduino platform"
 #endif  // !CONFIG_BLUEPAD32_PLATFORM_ARDUINO
 
+
+
+
 #include <Arduino.h>
 #include <Bluepad32.h>
 
 #include <ESP32Servo.h>
 #include <ESP32SharpIR.h>
 #include <QTRSensors.h>
+
+//Checkpoint 3 - Blink the onboard LED
+//We know pin 2 on the board is the built-in LED, but we need to tell the code that.
+#define LED 2 // Associate the variable LED with the number 2 
+int LED = 2;  // this way works too (useful for if we want to change what pin LED corresponds to later on in the program
+
+
+
 
 //
 // README FIRST, README FIRST, README FIRST
@@ -85,8 +96,24 @@ Servo servo;
 ESP32SharpIR sensor1( ESP32SharpIR::GP2Y0A21YK0F, 27);
 QTRSensors qtr;
 
+
 // Arduino setup function. Runs in CPU 1
-void setup() {
+void setup() { //put the code you want to run once in setup()
+
+/*#region Checkpoint 3 setup() Code */
+
+//Set the pin mode of out LED pin 
+//Template: pinMode (pin number, mode); 
+//INPUT, OUTPUT, PULLUP, etc, are all differnt modes we can use
+pinMode(LED, OUTPUT);
+//We want LED pin to be an output, since we are sending an on or off to that pin 
+
+/*#endregion*/
+
+
+
+
+/*#region Bluepad32 Setup Code */
     // Console.printf("Firmware: %s\n", BP32.firmwareVersion());
 
     // Setup the Bluepad32 callbacks
@@ -98,7 +125,7 @@ void setup() {
     // Forgetting Bluetooth keys prevents "paired" gamepads to reconnect.
     // But might also fix some connection / re-connection issues.
     BP32.forgetBluetoothKeys();
-
+/*#endregion*/
     ESP32PWM::allocateTimer(0);
 	ESP32PWM::allocateTimer(1);
 	ESP32PWM::allocateTimer(2);
@@ -121,7 +148,9 @@ void setup() {
 }
 
 // Arduino loop function. Runs in CPU 1
+//Put the code you want to run an infinite loop here
 void loop() {
+    
     // This call fetches all the gamepad info from the NINA (ESP32) module.
     // Just call this function in your main loop.
     // The gamepads pointer (the ones received in the callbacks) gets updated
