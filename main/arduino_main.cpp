@@ -1,17 +1,24 @@
 #include "sdkconfig.h"
 #include <Arduino.h>
+#include <Bluepad32.h>
+
+#include <ESP32Servo.h>
+#include <ESP32SharpIR.h>
+#include <QTRSensors.h>
 
 //Checkpoint 4 - Servo Control 
 
-// Arduino setup function. Runs in CPU 1
-//put the code you want to run once in setup()
-void setup() { 
+//Diego: Workshop
+Servo servo;
 
-
+void setup() {
+    servo.setPeriodHertz(50);
+    servo.attach(13, 1000, 2000);
 }
 
-// Arduino loop function. Runs in CPU 1
-//Put the code you want to run an infinite loop here
-void loop() {
-
+void loop () {
+    servo.write(1000);
+    delay(1000);
+    servo.write(2000);
+    delay(1000);
 }
