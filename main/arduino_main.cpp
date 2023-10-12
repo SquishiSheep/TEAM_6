@@ -87,6 +87,9 @@ Servo servoRight;
 ESP32SharpIR sensor1( ESP32SharpIR::GP2Y0A21YK0F, 27);
 QTRSensors qtr;
 
+const uint8_t SensorCount = 6;
+uint16_t sensorValues[SensorCount];
+
 // Arduino setup function. Runs in CPU 1
 void setup() {
     // Console.printf("Firmware: %s\n", BP32.firmwareVersion());
@@ -110,18 +113,27 @@ void setup() {
     servoLeft.attach(13, 1000, 2000);
     servoRight.attach(14, 1000, 2000);
 
+           // create an object for three QTR-xA sensors on analog inputs 0, 2, and 6
+    qtr.setTypeAnalog();
+    qtr.setSensorPins((const uint8_t[]){5, 17, 6}, 3);
+    //or 5,17,16,21,23,19,18, and change 3 to 8
+    //qtr.setEmitterPin(2);
+    
+    Serial.begin(115200);
+
+    
     // Serial.begin(115200);
-    // sensor1.setFilterRate(0.1f);
+    sensor1.setFilterRate(0.1f);
 
     // qtr.setTypeRC(); // or setTypeAnalog()
     // qtr.setSensorPins((const uint8_t[]) {12,13,14}, 3);
-    // for (uint8_t i = 0; i < 250; i++)
-    // {
-    //     Serial.println("calibrating");
-    //     qtr.calibrate();
-    //     delay(20);
-    // }
-    // qtr.calibrate();
+     for (uint8_t i = 0; i < 250; i++)
+        {
+        Serial.println("calibrating");
+        qtr.calibrate();
+        delay(20);
+    }
+     qtr.calibrate();
 }
 
 // Arduino loop function. Runs in CPU 1
@@ -152,7 +164,7 @@ void loop() {
             //     myGamepad->dpad(),        // DPAD
             //     myGamepad->buttons(),     // bitmask of pressed buttons
             //     myGamepad->axisX(),       // (-511 - 512) left X Axis
-            //     myGamepad->axisY(),       // (-511 - 512) left Y axis
+            //    myGamepad->axisY(),       // (-511 - 512) left Y axis
             //     myGamepad->axisRX(),      // (-511 - 512) right X axis
             //     myGamepad->axisRY(),      // (-511 - 512) right Y axis
             //     myGamepad->brake(),       // (0 - 1023): brake button
@@ -164,23 +176,53 @@ void loop() {
             // For all the available functions.
         }
     }
+    // create an object for four QTR-xRC sensors on digital pins 0 and 9, and on analog
+// inputs 1 and 3 (which are being used as digital inputs 15 and 17 in this case)
+    qtr.read(sensorValues);
 
-    // Serial.println(sensor1.getDistanceFloat());
+    BP32.update();
 
-    // uint16_t sensors[3];
-    // int16_t position = qtr.readLineBlack(sensors);
-    // int16_t error = position - 1000;
-    // if (error < 0)
-    // {
-    //     Serial.println("On the left");
-    // }
-    // if (error > 0)
-    // {
-    //     Serial.println("On the right");
-    // }
-    // if(error == 0){
-    //     Serial.println("Straight Ahead");  
-    // }
+    // It is safe to always do this before using the gamepad API.
+    // This guarantees that the gamepad is valid and connected.
+    for (int i = 0; i < BP32_MAX_GAMEPADS; i++) {
+        GamepadPtr myGamepad = myGamepads[i];
+
+        if (myGamepad && myGamepad->isConnected()) {
+
+        for (uint8_t i = 0; i < SensorCount; i++)
+        {
+            Serial.print(sensorValues[i]);
+            Serial.print('\t');
+        }
+
+        Serial.println(sensor1.getDistanceFloat());
+
+        uint16_t sensors[3];
+        int16_t position = qtr.readLineBlack(sensors);
+        int16_t error = position - 1000;
+
+        if (error < 0)
+        {
+            Serial.println("On the left");
+            servoLeft.write(950);
+            servoRight.write(1000);
+        }
+        if (error > 0)
+        {
+            Serial.println("On the right");
+            servoLeft.write(1000);
+            servoRight.write(950);
+        }
+        if(error == 0){
+        Serial.println("Straight Ahead");  
+        servoLeft.write(1000);
+        servoRight.write(1000);
+        }
+
+        }
     vTaskDelay(1);
-    // delay(100);
+    delay(100);
+    }
 }
+//fidjufs
+//follow the line
