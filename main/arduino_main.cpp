@@ -204,14 +204,14 @@ void loop() {
         if (error < 0)
         {
             Serial.println("On the left");
-            servoLeft.write(950);
+            servoLeft.write(500);
             servoRight.write(1000);
         }
         if (error > 0)
         {
             Serial.println("On the right");
             servoLeft.write(1000);
-            servoRight.write(950);
+            servoRight.write(500);
         }
         if(error == 0){
         Serial.println("Straight Ahead");  
