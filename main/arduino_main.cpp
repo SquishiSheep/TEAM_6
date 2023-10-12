@@ -1,18 +1,18 @@
-/****************************************************************************
-Copyright 2021 Ricardo Quesada
+//****************************************************************************
+//Copyright 2021 Ricardo Quesada
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+    //http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-****************************************************************************/
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+//****************************************************************************/
 
 #include "sdkconfig.h"
 #ifndef CONFIG_BLUEPAD32_PLATFORM_ARDUINO
@@ -81,7 +81,9 @@ void onDisconnectedGamepad(GamepadPtr gp) {
     }
 }
 
-Servo servo;
+Servo servoLeft;
+Servo servoRight;
+
 ESP32SharpIR sensor1( ESP32SharpIR::GP2Y0A21YK0F, 27);
 QTRSensors qtr;
 
@@ -103,8 +105,10 @@ void setup() {
 	ESP32PWM::allocateTimer(1);
 	ESP32PWM::allocateTimer(2);
 	ESP32PWM::allocateTimer(3);
-    servo.setPeriodHertz(50);
-    servo.attach(12, 1000, 2000);
+    servoLeft.setPeriodHertz(50);
+    servoRight.setPeriodHertz(50);
+    servoLeft.attach(13, 1000, 2000);
+    servoRight.attach(14, 1000, 2000);
 
     // Serial.begin(115200);
     // sensor1.setFilterRate(0.1f);
@@ -135,7 +139,8 @@ void loop() {
 
         if (myGamepad && myGamepad->isConnected()) {
 
-            servo.write( ((((float) myGamepad->axisY()) / 512.0f) * 500) + 1500 );
+            servoLeft.write( ((((float) myGamepad->axisY()) / 512.0f) * 500) + 1500 );
+            servoRight.write( ((((float) myGamepad->axisRY()) / 512.0f) * 500) + 1500 );
 
             // Another way to query the buttons, is by calling buttons(), or
             // miscButtons() which return a bitmask.
