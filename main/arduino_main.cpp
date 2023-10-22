@@ -12,44 +12,51 @@
 
 ESP32SharpIR left(ESP32SharpIR::GP2Y0A21YK0F, 27);
 ESP32SharpIR right(ESP32SharpIR::GP2Y0A21YK0F, 28);
-ESP32SharpIR forward(ESP32SharpIR::GP2Y0A21YK0F, 29);
+ESP32SharpIR straight(ESP32SharpIR::GP2Y0A21YK0F, 29);
+
+float testdist = 10;
 
 void setup () {
     left.setFilterRate(0.1f);
     right.setFilterRate(0.1f);
     straight.setFilterRate(0.1f);
     //float number
-
-    straightAhead() == FALSE;
-    turnLeft() == FALSE;
-    turnRight() == FALSE;
-    reset() == TRUE;
     
 }
+
 
 void loop() {
     Serial.printLn(left.getDistanceFloat());
     Serial.printLn(right.getDistanceFloat());
     Serial.printLn(straight.getDistanceFloat());
 
+    float left_dist = left.getDistanceFloat();
+    float right_dist = right.getDistanceFloat();
+    float straight_dist = straight.getDistanceFloat();
+
 //straight path
-  if (left == LOW && straight == HIGH && right == LOW){
-   straightAhead() == TRUE;
-  }
 
-//right only open
-  if (left == LOW && straight == LOW && right == HIGH){
-    turnRight() == TRUE;
-    delay(1000);
-    straightAhead() == TRUE;
-  }
+    if(straight_dist > testdist){
+        straightAhead();
+    }
 
-//left only open
-  if (left == HIGH && straight == LOW && right == LOW){
-    turnLeft() == TRUE;
-    delay(1000);
-    straightAhead() == TRUE;
-  }
+// right path clear
+    else if (left_dist <= testdist && right_dist > testdist && straight_dist <= testdist){
+        turnRight();
+    }
+// left only open
+    else if (left_dist > testdist && right_dist <= testdist && straight_dist <= testdist){
+        turnLeft();  
+    }
+
+
+
+
+
+
+
+
+
   
 //dead end
 if (left == LOW && straight == LOW && right == LOW){
@@ -106,6 +113,11 @@ void turnRight()  {
 void straightAhead()  {
   ServoRight.write(2000);
   ServoLeft.write(2000);
+}
+
+void stop() {
+  ServoRight.write(1500);
+  ServoLeft.write(1500);
 }
 
 void flip() {
