@@ -34,7 +34,7 @@ void loop() {
 
 //straight path
   if (left == LOW && straight == HIGH && right == LOW){
-   straightOpen() == TRUE;
+   straightAhead() == TRUE;
   }
 
 //right only open
@@ -68,18 +68,18 @@ if (left == LOW && straight == LOW && right == LOW){
   }
 
  // if left and straight open, choose left
- if (turnLeft() == TRUE && straightOpen() == TRUE){
-  straightOpen() == FALSE;
+ if (turnLeft() == TRUE && straightAhead() == TRUE){
+  straightAhead() == FALSE;
  }
 
  //if left and straight and right open, choose left
- if (turnLeft() == TRUE && straightOpen() == TRUE && turnRight() == TRUE){
-  straightOpen() == FALSE;
+ if (turnLeft() == TRUE && straightAhead() == TRUE && turnRight() == TRUE){
+  straightAhead() == FALSE;
   turnRight() == FALSE;
  }
 
   //if straight and right open, go straight
- if (straightOpen() == TRUE && turnRight() == TRUE){
+ if (straightAhead() == TRUE && turnRight() == TRUE){
   turnRight() == FALSE;
  }
 
