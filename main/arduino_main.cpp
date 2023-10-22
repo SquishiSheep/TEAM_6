@@ -49,15 +49,11 @@ void loop() {
         turnLeft();  
     }
 
+// left and right open
+    else if (left_dist > testdist && right_dist > testdist && straight_dist <= testdist){
+        turnLeft(); //default behaivor is turn left
+    }
 
-
-
-
-
-
-
-
-  
 //dead end
 if (left == LOW && straight == LOW && right == LOW){
     flip() == TRUE;
@@ -65,39 +61,6 @@ if (left == LOW && straight == LOW && right == LOW){
     straightAhead() == TRUE;
   }
 
-  //if left and right open, choose left
-  //haha ha
-  //jk i need to change
-  //these to LOW AND HIGH
-  //LOL
-  if (turnLeft() == TRUE && turnRight() == TRUE){
-    turnRight() == FALSE;
-  }
-
- // if left and straight open, choose left
- if (turnLeft() == TRUE && straightAhead() == TRUE){
-  straightAhead() == FALSE;
- }
-
- //if left and straight and right open, choose left
- if (turnLeft() == TRUE && straightAhead() == TRUE && turnRight() == TRUE){
-  straightAhead() == FALSE;
-  turnRight() == FALSE;
- }
-
-  //if straight and right open, go straight
- if (straightAhead() == TRUE && turnRight() == TRUE){
-  turnRight() == FALSE;
- }
-
-  delay(1000);
-
-  reset();
-}
-
-void goStraight(){
-  straightAhead() == TRUE;
-}
 
 void turnLeft() {
   //change values based on testing
