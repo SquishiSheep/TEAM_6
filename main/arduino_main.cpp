@@ -14,6 +14,7 @@ ESP32SharpIR left(ESP32SharpIR::GP2Y0A21YK0F, 27);
 ESP32SharpIR right(ESP32SharpIR::GP2Y0A21YK0F, 28);
 ESP32SharpIR straight(ESP32SharpIR::GP2Y0A21YK0F, 29);
 
+//change # based on sensor
 float testdist = 10;
 
 void setup () {
@@ -54,12 +55,27 @@ void loop() {
         turnLeft(); //default behaivor is turn left
     }
 
-//dead end
-if (left == LOW && straight == LOW && right == LOW){
-    flip() == TRUE;
-    delay(1000);
-    straightAhead() == TRUE;
-  }
+//  dead end
+    else if (left_dist <= testdist && right_dist <= testdist && straight_dish <= testdist){
+        flip();
+    }
+// if left and right open, choose left
+    else if (left_dist > testdist && right_dist > testdist && straight_dish <= testdist){
+        turnLeft();
+    }
+    //if left and straight open
+     else if (left_dist > testdist && right_dist <= testdist && straight_dish > testdist){
+        turnLeft();
+    }
+    //if straight and right open, go straight
+     else if (left_dist <= testdist && right_dist > testdist && straight_dish > testdist){
+        turnLeft();
+    }
+    //if all open
+      else if (left_dist > testdist && right_dist > testdist && straight_dish > testdist){
+        turnLeft();
+    }
+}
 
 
 void turnLeft() {
@@ -86,14 +102,6 @@ void stop() {
 void flip() {
   ServoLeft.write(1000);
   ServoRight.write(2000);
-}
-
-void reset(){
-  turnLeft() == FALSE;
-  turnRight() == FALSE;
-  straightAhead() == FALSE;
-  flip() == FALSE;
-  goStraight() == FALSE;
 }
 
 //helper functions
