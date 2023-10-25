@@ -14,6 +14,9 @@ ESP32SharpIR left(ESP32SharpIR::GP2Y0A21YK0F, 27);
 ESP32SharpIR right(ESP32SharpIR::GP2Y0A21YK0F, 28);
 ESP32SharpIR straight(ESP32SharpIR::GP2Y0A21YK0F, 29);
 
+//change pin numebr to robot
+int ServoRight = 1;
+int ServoLeft = 2;
 //change # based on sensor
 float testdist = 10;
 
@@ -22,14 +25,16 @@ void setup () {
     right.setFilterRate(0.1f);
     straight.setFilterRate(0.1f);
     //float number
+    ServoLeft.attach(1);
+    ServoRight.attach(2);
     
 }
 
 
 void loop() {
-    Serial.printLn(left.getDistanceFloat());
-    Serial.printLn(right.getDistanceFloat());
-    Serial.printLn(straight.getDistanceFloat());
+    Serial.printIn(left.getDistanceFloat());
+    Serial.printIn(right.getDistanceFloat());
+    Serial.printIn(straight.getDistanceFloat());
 
     float left_dist = left.getDistanceFloat();
     float right_dist = right.getDistanceFloat();
