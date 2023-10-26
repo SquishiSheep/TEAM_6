@@ -82,12 +82,12 @@ void loop () {
     Serial.printIn(a);
 
 //flashing is 5 seconds in between reading a color again
-//
-//make sure to give robot time to move
-//with 5 second delay
-//to give time for light flashing
 
 //also change r,g,b percentages based on testing of color sensor
+
+//change last delay of each if based on how large the color sensor field is
+//and how much the robot has to move
+
     if (findThisColor == -1){
         findThisColor = apds.readColor();
 
@@ -97,6 +97,9 @@ void loop () {
         delay(100)
         digitalWrite(ONBOARD_LED,LOW);
         delay(3900);
+        servoLeft.write(2000);
+        servoRight.write(2000);
+        delay(2000);
 
     } else if (apds.readColor == (g >= 0.60){
         delay(1000);
@@ -106,6 +109,9 @@ void loop () {
         delay(100);
         digitalWrite(ONBOARD_LED,HIGH);
         delay(3800);
+        servoLeft.write(2000);
+        servoRight.write(2000);
+        delay(2000);
 
     }  else if (apds.readColor == (b >= 0.60){
         delay(1000);
@@ -119,6 +125,9 @@ void loop () {
         delay(100);
         digitalWrite(ONBOARD_LED,HIGH);
         delay(3600);
+        servoLeft.write(2000);
+        servoRight.write(2000);
+        delay(2000);
     
     //yippee we found the color
     } else if (apds.readColor == findThisColor){
@@ -135,11 +144,7 @@ void loop () {
         digitalWrite(ONBOARD_LED,HIGH);
         delay(100);
         digtialWrite(ONBOARD_LED,LOW);
-        delay(4500);
-    } else {
-        servoRight.write(2000);
-        servoLeft.write(2000);
-
+        delay(500);
+        //hopefully this makes a full 360 and flashes
     }
-    
 }
