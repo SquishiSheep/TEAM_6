@@ -37,38 +37,109 @@
 #define I2CSCL 22
 #define I2C_FREQ 100000
 
+//flash for comp
+#define ONBOARD_LED 3
+
 //Color sensor unit & I2C unit
 TwoWire I2C_0 = TwoWire(0);
 APSD9960 apds = APDS9960(I2C_0; APDS9960_INT);
 
 void setup(){
     //sets up I2C protocol
-I2C_0.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+    I2C_0.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
 
-// Set up color sensor
-apds.setInterruptPin(APDS9960_INT);
-apds.begin();
-Serial.begin(115200);
-}
+    // Set up color sensor
+    apds.setInterruptPin(APDS9960_INT);
+    apds.begin();
+    Serial.begin(115200);
+
+    //LED
+    pinMode(ONBOARD_LED,OUTPUT);
+    }
 
 void loop () {
-int r, g, b, a;
+    int r, g, b, a;
 
-//wait until color is ready from sensor
-while (!apds.colorAvailable()){
-    delay(5);
-}
+    //wait until color is ready from sensor
+    while (!apds.colorAvailable()){
+        delay(5);
+    }
 
-//read color from sensor
-apds.readColor(r, g, b, a);
+    //int to set color to find
+    int findThisColor = -1
 
-//print color in decimal
-Serial.print("RED: ");
-Serial.printIn(r);
-Serial.print("GREEN: ");
-serial.printIn(g);
-Serial.print("BLUE: ");
-Serial.printIn(b);
-Serial.print("AMBIENT: ");
-Serial.printIn(a);
+    //read color from sensor
+    apds.readColor(r, g, b, a);
+
+    //print color in decimal
+    Serial.print("RED: ");
+    Serial.printIn(r);
+    Serial.print("GREEN: ");
+    serial.printIn(g);
+    Serial.print("BLUE: ");
+    Serial.printIn(b);
+    Serial.print("AMBIENT: ");
+    Serial.printIn(a);
+
+//flashing is 5 seconds in between reading a color again
+//
+//make sure to give robot time to move
+//with 5 second delay
+//to give time for light flashing
+
+//also change r,g,b percentages based on testing of color sensor
+    if (findThisColor == -1){
+        findThisColor = apds.readColor();
+
+    } else if (apds.readColor == (r >= 0.60)){
+        delay(1000);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100)
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(3900);
+
+    } else if (apds.readColor == (g >= 0.60){
+        delay(1000);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(100);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(3800);
+
+    }  else if (apds.readColor == (b >= 0.60){
+        delay(1000);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(100);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(100);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(3600);
+    
+    //yippee we found the color
+    } else if (apds.readColor == findThisColor){
+        servoRight.write(2000);
+        servoLeft.write(1000);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(100);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(100);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digtialWrite(ONBOARD_LED,LOW);
+        delay(4500);
+    } else {
+        servoRight.write(2000);
+        servoLeft.write(2000);
+
+    }
+    
 }
