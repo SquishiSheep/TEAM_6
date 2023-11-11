@@ -1,5 +1,5 @@
 #include "ESP32SharpIR.h"
-
+int corrected = 0;
 ESP32SharpIR::ESP32SharpIR( sensorCode _sensorType , uint8_t _sensorPin ) {
 
   // Assign sensor type and pin number
@@ -53,8 +53,9 @@ uint8_t ESP32SharpIR::getRawDistance( bool avoidBurstRead ) {
       break;
 
     case GP2Y0A21YK0F :
-
-      distance = (28400) / (analogRead(pin));
+      corrected = analogRead(pin);
+      if ((corrected) <= 10){corrected = 10;}
+      distance = (28400) / (corrected);
       if (distance > 80) return 81;
       else if (distance < 10) return 9;
       else return distance;

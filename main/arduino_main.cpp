@@ -56,6 +56,7 @@
 
 Servo servoLeft;
 Servo servoRight;
+Servo servoDump;
 
 //autonomous task booleans
 bool doingLineSensorTask = false;
@@ -467,7 +468,7 @@ void loop() {
                 }
                 else if(myGamepad->b()){
                     Serial.println("---B pressed---");
-                    doingColorSensorTask = true;
+                   // doingColorSensorTask = true;
                 }
                 else if(myGamepad->y()){
                     Serial.println("---Y pressed---");
