@@ -278,15 +278,35 @@ void colorSensor(){
         servoRight.write(2000);
         servoLeft.write(1000);
         digitalWrite(ONBOARD_LED,HIGH);
-        delay(100);
+        delay(450);
         digitalWrite(ONBOARD_LED,LOW);
-        delay(100);
+        delay(450);
         digitalWrite(ONBOARD_LED,HIGH);
-        delay(100);
+        delay(450);
         digitalWrite(ONBOARD_LED,LOW);
-        delay(100);
+        delay(450);
         digitalWrite(ONBOARD_LED,HIGH);
-        delay(100);
+        delay(450);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(500);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(450);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(500);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(450);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(500);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(450);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(500);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(450);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(500);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(450);
         digitalWrite(ONBOARD_LED,LOW);
         delay(500);
         //hopefully this makes a full 360 and flashes
@@ -379,20 +399,48 @@ void setup() {
     servoLeft.setPeriodHertz(50);
     servoRight.setPeriodHertz(50);
     servoLeft.attach(23, 1000, 2000);
-    servoRight.attach(22, 1000, 2000);
+    servoRight.attach(5, 1000, 2000);
 
- digitalWrite(ONBOARD_LED,HIGH);
-        delay(1000);
-        digitalWrite(ONBOARD_LED,LOW);
-        delay(10);
     //sets up I2C protocol
     I2C_0.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
 
     // Set up color sensor
     apds.setInterruptPin(APDS9960_INT);
     apds.begin();
+
+      qtr.setTypeAnalog();
+    qtr.setSensorPins((const uint8_t[]){36, 39, 34, 35,32,33,25,26}, 8);
+
     Serial.begin(115200);
 
+    for (uint8_t i = 0; i < 70; i++)
+    {
+        Serial.println("calibrating");
+        qtr.calibrate();
+            //Crappy Auto-calibration:
+         /*   servoRight.write(2000);
+            servoLeft.write(1000);
+
+            delay(300);
+            servoLeft.write(2000);
+            servoRight.write(1000);
+            delay(300);
+            */
+           delay(20);
+
+    }    
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(1000);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(500);
+                digitalWrite(ONBOARD_LED,HIGH);
+        delay(1000);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(500);
+                digitalWrite(ONBOARD_LED,HIGH);
+        delay(1000);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(500);
 
  }
 
@@ -504,12 +552,15 @@ void loop() {
             // You can query the axis and other properties as well. See Gamepad.h
             // For all the available functions.
         }
-    }
-
-
-
 
     vTaskDelay(1);
     delay(100);
+
     }
 
+  }
+
+
+
+
+    
