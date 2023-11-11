@@ -78,8 +78,8 @@ ESP32SharpIR straight(ESP32SharpIR::GP2Y0A21YK0F, 27);
 
 //change pin numebr to robot
 
-//int ServoRight = 23;
-//int ServoLeft = 24;
+//int servoRight = 23;
+//int servoLeft = 24;
 //WHY DID I ADD THIS
 
 
@@ -174,29 +174,29 @@ else{
 }
 void turnLeft() {
   //change values based on testing
-  ServoRight.write(2000);
+  servoRight.write(2000);
   servoLeft.write(1500);
 
 }
 
 void turnRight()  {
-  ServoRight.write(1500);
-  ServoLeft.write(2000);
+  servoRight.write(1500);
+  servoLeft.write(2000);
 }
 
 void straightAhead()  {
-  ServoRight.write(2000);
-  ServoLeft.write(2000);
+  servoRight.write(2000);
+  servoLeft.write(2000);
 }
 
 void stop() {
-  ServoRight.write(1500);
-  ServoLeft.write(1500);
+  servoRight.write(1500);
+  servoLeft.write(1500);
 }
 
 void flip() {
-  ServoLeft.write(1000);
-  ServoRight.write(2000);
+  servoLeft.write(1000);
+  servoRight.write(2000);
 }
 
 void colorSensor(){
@@ -327,23 +327,23 @@ void mazeFollow(){
     }
 
 //  dead end
-    else if (left_dist <= testdist && right_dist <= testdist && straight_dish <= testdist){
+    else if (left_dist <= testdist && right_dist <= testdist && straight_dist <= testdist){
         flip();
     }
 // if left and right open, choose left
-    else if (left_dist > testdist && right_dist > testdist && straight_dish <= testdist){
+    else if (left_dist > testdist && right_dist > testdist && straight_dist <= testdist){
         turnLeft();
     }
     //if left and straight open
-     else if (left_dist > testdist && right_dist <= testdist && straight_dish > testdist){
+     else if (left_dist > testdist && right_dist <= testdist && straight_dist > testdist){
         turnLeft();
     }
     //if straight and right open, go straight
-     else if (left_dist <= testdist && right_dist > testdist && straight_dish > testdist){
+     else if (left_dist <= testdist && right_dist > testdist && straight_dist > testdist){
         turnLeft();
     }
     //if all open
-      else if (left_dist > testdist && right_dist > testdist && straight_dish > testdist){
+      else if (left_dist > testdist && right_dist > testdist && straight_dist > testdist){
         turnLeft();
     }
 }
@@ -413,16 +413,16 @@ void loop() {
         if (myGamepad && myGamepad->isConnected()) {
 
             if(!doingLineSensorTask && !doingColorSensorTask && !doingMazeFollowTask){
-                if(myGamepad->buttonPressed(BTN_A)){
+                if(myGamepad->a()){
                     doingLineSensorTask = true;
                 }
-                else if(myGamepad->buttonPressed(BTN_B)){
+                else if(myGamepad->b()){
                     doingColorSensorTask = true;
                 }
-                else if(myGamepad->buttonPressed(BTN_Y)){
+                else if(myGamepad->y()){
                     doingMazeFollowTask = true;
                 }
-                else if(myGamepad->buttonPressed(BTN_X)){
+                else if(myGamepad->x()){
                     doingPizzaDeliveryTask = true;
                 }
                 else{ //if no button pressed
@@ -434,7 +434,7 @@ void loop() {
                 }
                 
             }
-            if (myGamepad->buttonPressed(BTN_BACK))
+            if (myGamepad->miscBack())
             { //if back/select button pressed, stop autonomous task, allow for manual control
                 doingLineSensorTask = false;
                 doingColorSensorTask = false;
@@ -499,4 +499,4 @@ void loop() {
     vTaskDelay(1);
     delay(100);
     }
-}
+
