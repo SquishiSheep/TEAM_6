@@ -158,23 +158,26 @@ void lineSensor(){
 if(position > 3600){ //if to right of line
 //1000 (max negative speed) 1500 (0 speed) 2000 (max positive speed)
 
-    servoRight.write(1600);
-    servoLeft.write(1400);
+    servoRight.write(1400);
+    servoLeft.write(1600);
 }
 
 
 else if(position < 3400){ // if to left of line
 //1000 1500 2000
 
-    servoRight.write(1400);
-    servoLeft.write(1600);
+    servoRight.write(1600);
+    servoLeft.write(1400);
 }
 else{
-    servoRight.write(2000);
-    servoLeft.write(2000);
+    servoRight.write(1000);
+    servoLeft.write(1000);
 }
     delay(10);
 }
+
+
+
 void turnLeft() {
   //change values based on testing
   servoRight.write(2000);
@@ -184,12 +187,12 @@ void turnLeft() {
 
 void turnRight()  {
   servoRight.write(1500);
-  servoLeft.write(2000);
+  servoLeft.write(1000);
 }
 
 void straightAhead()  {
   servoRight.write(2000);
-  servoLeft.write(2000);
+  servoLeft.write(1000);
 }
 
 void stop() {
@@ -198,7 +201,7 @@ void stop() {
 }
 
 void flip() {
-  servoLeft.write(1000);
+  servoLeft.write(2000);
   servoRight.write(2000);
 }
 
@@ -245,7 +248,7 @@ void colorSensor(){
         digitalWrite(ONBOARD_LED,LOW);
         delay(3900);
         servoLeft.write(2000);
-        servoRight.write(2000);
+        servoRight.write(1000);
         delay(2000);
 
     } else if (g > colorThreshold && r < colorThreshold && b < colorThreshold) {
@@ -257,7 +260,7 @@ void colorSensor(){
         digitalWrite(ONBOARD_LED,HIGH);
         delay(3800);
         servoLeft.write(2000);
-        servoRight.write(2000);
+        servoRight.write(1000);
         delay(2000);
 
     }  else if (b > colorThreshold && r < colorThreshold && g < colorThreshold) {
@@ -273,12 +276,12 @@ void colorSensor(){
         digitalWrite(ONBOARD_LED,HIGH);
         delay(3600);
         servoLeft.write(2000);
-        servoRight.write(2000);
+        servoRight.write(1000);
         delay(2000);
     
     //yippee we found the color
     } else if (findThisColor) {
-        servoRight.write(2000);
+        servoRight.write(1000);
         servoLeft.write(1000);
         digitalWrite(ONBOARD_LED,HIGH);
         delay(450);
@@ -328,7 +331,9 @@ void mazeFollow(){
     float right_dist = right.getDistanceFloat();
     float straight_dist = straight.getDistanceFloat();
     
-    Serial.println(left_dist, straight_dist, right_dist);
+    Serial.println(left_dist);
+    Serial.println(straight_dist);
+    Serial.println(right_dist);
 
 //straight path
 
@@ -373,12 +378,15 @@ void mazeFollow(){
 }
 
 void pizzaDelivery(){
-    servoLeft.write(2000);
+    servoLeft.write(1000);
     servoRight.write(2000);
     delay(4000);
-    servoDump.write(90));
+    servoLeft.write(1500);
+    servoRight.write(1500);
+    servoDump.write(2000);
     delay(3000);
-    servoDump.write(0));
+    servoDump.write(0);
+    doingPizzaDeliveryTask = false;
 }
 
 //
@@ -412,7 +420,7 @@ void setup() {
     servoDump.setPeriodHertz(50);
     servoLeft.attach(23, 1000, 2000);
     servoRight.attach(5, 1000, 2000);
-    servoDump.attach(16, 544, 2400);
+    servoDump.attach(15, 544, 2400);
     servoDump.write(0);
 
     //sets up I2C protocol
@@ -432,12 +440,12 @@ void setup() {
         Serial.println("calibrating");
         qtr.calibrate();
             //Crappy Auto-calibration:
-         /*   servoRight.write(2000);
+         /*   servoRight.write(1000);
             servoLeft.write(1000);
 
             delay(300);
             servoLeft.write(2000);
-            servoRight.write(1000);
+            servoRight.write(2000);
             delay(300);
             */
            delay(20);
@@ -536,7 +544,7 @@ void loop() {
             else{ //manual control
                 Serial.println("Manual Control!!");
                 servoLeft.write( ((((float) myGamepad->axisY()) / 512.0f) * 500) + 1500 );
-                servoRight.write( ((((float) myGamepad->axisRY()) / 512.0f) * 500) + 1500 );
+                servoRight.write(1500 - ((((float)myGamepad->axisRY()) / 512.0f) * 500));
             }
 
 
