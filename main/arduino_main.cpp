@@ -69,6 +69,8 @@ APDS9960 apds = APDS9960(I2C_0, APDS9960_INT);
 
 GamepadPtr myGamepads[BP32_MAX_GAMEPADS];
 
+QTRSensors qtr;
+int16_t position = 3500;
 
 ESP32SharpIR left(ESP32SharpIR::GP2Y0A21YK0F, 25);
 ESP32SharpIR right(ESP32SharpIR::GP2Y0A21YK0F, 26);
@@ -127,15 +129,226 @@ void onDisconnectedGamepad(GamepadPtr gp) {
 
 void lineSensor(){
 //if blank pressed if while 
+ uint16_t sensors[8];
+    position = abs(7000-qtr.readLineBlack(sensors));
+
+    Serial.print(" 1: ");
+    Serial.print(sensors[0]);
+    Serial.print(" 2: ");
+    Serial.print(sensors[1]);
+    Serial.print(" 3: ");
+    Serial.print(sensors[2]);
+    Serial.print(" 4: ");
+    Serial.print(sensors[3]);
+    Serial.print(" 5: ");
+    Serial.print(sensors[4]);
+    Serial.print(" 6: ");
+    Serial.print(sensors[5]);
+    Serial.print(" 7: ");
+    Serial.print(sensors[6]);
+    Serial.print(" 8: ");
+    Serial.print(sensors[7]);
+    Serial.print(" Pos: ");
+    Serial.println(position);
+
+//3200 <= center position <= 4000
+if(position > 3600){ //if to right of line
+//1000 (max negative speed) 1500 (0 speed) 2000 (max positive speed)
+
+    servoRight.write(1600);
+    servoLeft.write(1400);
+}
+
+
+else if(position < 3400){ // if to left of line
+//1000 1500 2000
+
+    servoRight.write(1400);
+    servoLeft.write(1600);
+}
+else{
+    servoRight.write(2000);
+    servoLeft.write(2000);
+}
+    delay(10);
+}
+void turnLeft() {
+  //change values based on testing
+  ServoRight.write(2000);
+  servoLeft.write(1500);
+
+}
+
+void turnRight()  {
+  ServoRight.write(1500);
+  ServoLeft.write(2000);
+}
+
+void straightAhead()  {
+  ServoRight.write(2000);
+  ServoLeft.write(2000);
+}
+
+void stop() {
+  ServoRight.write(1500);
+  ServoLeft.write(1500);
+}
+
+void flip() {
+  ServoLeft.write(1000);
+  ServoRight.write(2000);
+}
+
+void colorSensor(){
+ int r, g, b, a;
+
+    //wait until color is ready from sensor
+    while (!apds.colorAvailable()){
+        delay(5);
+    }
+
+    //int to set color to find
+    int findThisColor = -1;
+
+    //read color from sensor
+    apds.readColor(r, g, b, a);
+
+    //print color in decimal
+    Serial.print("RED: ");
+    Serial.print(r);
+    Serial.print(" GREEN: ");
+    Serial.print(g);
+    Serial.print(" BLUE: ");
+    Serial.print(b);
+    Serial.print(" AMBIENT: ");
+    Serial.println(a);
+
+    const int colorThreshold = 200;
+//flashing is 5 seconds in between reading a color again
+
+//also change r,g,b percentages based on testing of color sensor
+
+//change last delay of each if based on how large the color sensor field is
+//and how much the robot has to move
+
+    if (findThisColor == -1){
+        findThisColor = apds.readColor(r, g, b, a);
+
+
+    } else if (r > colorThreshold && g < colorThreshold && b < colorThreshold){
+        delay(1000);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(3900);
+        servoLeft.write(2000);
+        servoRight.write(2000);
+        delay(2000);
+
+    } else if (g > colorThreshold && r < colorThreshold && b < colorThreshold) {
+        delay(1000);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(100);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(3800);
+        servoLeft.write(2000);
+        servoRight.write(2000);
+        delay(2000);
+
+    }  else if (b > colorThreshold && r < colorThreshold && g < colorThreshold) {
+        delay(1000);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(100);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(100);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(3600);
+        servoLeft.write(2000);
+        servoRight.write(2000);
+        delay(2000);
+    
+    //yippee we found the color
+    } else if (findThisColor) {
+        servoRight.write(2000);
+        servoLeft.write(1000);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(100);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(100);
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(100);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(500);
+        //hopefully this makes a full 360 and flashes
+
+    }
 }
 
 void mazeFollow(){
 
+
+    Serial.println(left.getDistanceFloat());
+    Serial.println(right.getDistanceFloat());
+    Serial.println(straight.getDistanceFloat());
+
+    float left_dist = left.getDistanceFloat();
+    float right_dist = right.getDistanceFloat();
+    float straight_dist = straight.getDistanceFloat();
+    
+
+//straight path
+
+    if(straight_dist > testdist){
+        straightAhead();
+    }
+
+// right path clear
+    else if (left_dist <= testdist && right_dist > testdist && straight_dist <= testdist){
+        turnRight();
+    }
+// left only open
+    else if (left_dist > testdist && right_dist <= testdist && straight_dist <= testdist){
+        turnLeft();  
+    }
+
+// left and right open
+    else if (left_dist > testdist && right_dist > testdist && straight_dist <= testdist){
+        turnLeft(); //default behaivor is turn left
+    }
+
+//  dead end
+    else if (left_dist <= testdist && right_dist <= testdist && straight_dish <= testdist){
+        flip();
+    }
+// if left and right open, choose left
+    else if (left_dist > testdist && right_dist > testdist && straight_dish <= testdist){
+        turnLeft();
+    }
+    //if left and straight open
+     else if (left_dist > testdist && right_dist <= testdist && straight_dish > testdist){
+        turnLeft();
+    }
+    //if straight and right open, go straight
+     else if (left_dist <= testdist && right_dist > testdist && straight_dish > testdist){
+        turnLeft();
+    }
+    //if all open
+      else if (left_dist > testdist && right_dist > testdist && straight_dish > testdist){
+        turnLeft();
+    }
 }
 
-void colorSensor(){
 
-}
 
 //
 //
@@ -146,7 +359,14 @@ void colorSensor(){
 void setup() {
     // Console.printf("Firmware: %s\n", BP32.firmwareVersion());
 
+    
+     pinMode(ONBOARD_LED,OUTPUT);
+
     // Setup the Bluepad32 callbacks
+    left.setFilterRate(0.1f);
+    right.setFilterRate(0.1f);
+    straight.setFilterRate(0.1f);
+
     BP32.setup(&onConnectedGamepad, &onDisconnectedGamepad);
 
     // "forgetBluetoothKeys()" should be called when the user performs
@@ -161,7 +381,18 @@ void setup() {
     servoLeft.attach(23, 1000, 2000);
     servoRight.attach(22, 1000, 2000);
 
+ digitalWrite(ONBOARD_LED,HIGH);
+        delay(1000);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(10);
+    //sets up I2C protocol
+    I2C_0.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+
+    // Set up color sensor
+    apds.setInterruptPin(APDS9960_INT);
+    apds.begin();
     Serial.begin(115200);
+
 
  }
 
