@@ -1,3 +1,4 @@
+
 //****************************************************************************
 //Copyright 2021 Ricardo Quesada
 
@@ -34,17 +35,28 @@
 //color sensor definitions
 #define APDS9960_INT 2
 #define I2C_SDA 21
-#define I2CSCL 22
+#define I2C_SCL 22
 #define I2C_FREQ 100000
 
 //flash for comp
-#define ONBOARD_LED 3
+#define ONBOARD_LED 2
 
 //Color sensor unit & I2C unit
 TwoWire I2C_0 = TwoWire(0);
-APSD9960 apds = APDS9960(I2C_0; APDS9960_INT);
+APDS9960 apds = APDS9960(I2C_0, APDS9960_INT);
+
+Servo servoLeft;
+Servo servoRight;
+
+ESP32SharpIR sensor1( ESP32SharpIR::GP2Y0A21YK0F, 27);
+QTRSensors qtr;
 
 void setup(){
+
+        digitalWrite(ONBOARD_LED,HIGH);
+        delay(1000);
+        digitalWrite(ONBOARD_LED,LOW);
+        delay(10);
     //sets up I2C protocol
     I2C_0.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
 
@@ -55,7 +67,7 @@ void setup(){
 
     //LED
     pinMode(ONBOARD_LED,OUTPUT);
-    }
+}
 
 void loop () {
     int r, g, b, a;
@@ -66,21 +78,22 @@ void loop () {
     }
 
     //int to set color to find
-    int findThisColor = -1
+    int findThisColor = -1;
 
     //read color from sensor
     apds.readColor(r, g, b, a);
 
     //print color in decimal
     Serial.print("RED: ");
-    Serial.printIn(r);
+    Serial.println(r);
     Serial.print("GREEN: ");
-    serial.printIn(g);
+    Serial.println(g);
     Serial.print("BLUE: ");
-    Serial.printIn(b);
+    Serial.println(b);
     Serial.print("AMBIENT: ");
-    Serial.printIn(a);
+    Serial.println(a);
 
+    const int colorThreshold = 200;
 //flashing is 5 seconds in between reading a color again
 
 //also change r,g,b percentages based on testing of color sensor
@@ -89,19 +102,19 @@ void loop () {
 //and how much the robot has to move
 
     if (findThisColor == -1){
-        findThisColor = apds.readColor();
+        findThisColor = apds.readColor(r, g, b, a);
 
-    } else if (apds.readColor == (r >= 0.60)){
+    } else if (r > colorThreshold && g < colorThreshold && b < colorThreshold){
         delay(1000);
         digitalWrite(ONBOARD_LED,HIGH);
-        delay(100)
+        delay(100);
         digitalWrite(ONBOARD_LED,LOW);
         delay(3900);
         servoLeft.write(2000);
         servoRight.write(2000);
         delay(2000);
 
-    } else if (apds.readColor == (g >= 0.60){
+    } else if (g > colorThreshold && r < colorThreshold && b < colorThreshold) {
         delay(1000);
         digitalWrite(ONBOARD_LED,HIGH);
         delay(100);
@@ -113,7 +126,7 @@ void loop () {
         servoRight.write(2000);
         delay(2000);
 
-    }  else if (apds.readColor == (b >= 0.60){
+    }  else if (b > colorThreshold && r < colorThreshold && g < colorThreshold) {
         delay(1000);
         digitalWrite(ONBOARD_LED,HIGH);
         delay(100);
@@ -130,7 +143,7 @@ void loop () {
         delay(2000);
     
     //yippee we found the color
-    } else if (apds.readColor == findThisColor){
+    } else if (findThisColor) {
         servoRight.write(2000);
         servoLeft.write(1000);
         digitalWrite(ONBOARD_LED,HIGH);
@@ -143,8 +156,10 @@ void loop () {
         delay(100);
         digitalWrite(ONBOARD_LED,HIGH);
         delay(100);
-        digtialWrite(ONBOARD_LED,LOW);
+        digitalWrite(ONBOARD_LED,LOW);
         delay(500);
         //hopefully this makes a full 360 and flashes
+
     }
+
 }
