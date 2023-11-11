@@ -412,7 +412,7 @@ void loop() {
 
         if (myGamepad && myGamepad->isConnected()) {
 
-            if(!doingLineSensorTask && !doingColorSensorTask && !doingMazeFollowTask){
+            if(!doingLineSensorTask && !doingColorSensorTask && !doingMazeFollowTask && !doingPizzaDeliveryTask){
                 if(myGamepad->a()){
                     doingLineSensorTask = true;
                 }
@@ -434,7 +434,7 @@ void loop() {
                 }
                 
             }
-            if (myGamepad->miscBack())
+            if (myGamepad->thumbL())
             { //if back/select button pressed, stop autonomous task, allow for manual control
                 doingLineSensorTask = false;
                 doingColorSensorTask = false;
@@ -444,18 +444,24 @@ void loop() {
             
 
             if (doingLineSensorTask){//line sensor task run in the loop 
+                Serial.println("Line Time!!");
                 lineSensor();
             }
 
             else if (doingColorSensorTask){//color sensor task
+                Serial.println("Color Time!!");
+
                 colorSensor();
             }
 
             else if (doingMazeFollowTask){ //maze follow task
+                Serial.println("Maze Time!!");
                 mazeFollow();
             }
 
             else if (doingPizzaDeliveryTask){ //pizza delivery task
+                Serial.println("Pizza Time!!");
+                delay(100);
                 //pizzaDelivery();
             }
 
@@ -471,22 +477,22 @@ void loop() {
 
 
             // Another way to query the buttons, is by calling buttons(), or
-            // miscButtons() which return a bitmask.
-            // Some gamepads also have DPAD, axis and more.
-            Console.printf(
-                "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, "
-                "%4d, brake: %4d, throttle: %4d, misc: 0x%02x\n",
-                i,                        // Gamepad Index
-                myGamepad->dpad(),        // DPAD
-                myGamepad->buttons(),     // bitmask of pressed buttons
-                myGamepad->axisX(),       // (-511 - 512) left X Axis
-               myGamepad->axisY(),       // (-511 - 512) left Y axis
-                myGamepad->axisRX(),      // (-511 - 512) right X axis
-                myGamepad->axisRY(),      // (-511 - 512) right Y axis
-                myGamepad->brake(),       // (0 - 1023): brake button
-                myGamepad->throttle(),    // (0 - 1023): throttle (AKA gas) button
-                myGamepad->miscButtons()  // bitmak of pressed "misc" buttons
-            );
+            // // miscButtons() which return a bitmask.
+            // // Some gamepads also have DPAD, axis and more.
+            // Console.printf(
+            //     "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, "
+            //     "%4d, brake: %4d, throttle: %4d, misc: 0x%02x\n",
+            //     i,                        // Gamepad Index
+            //     myGamepad->dpad(),        // DPAD
+            //     myGamepad->buttons(),     // bitmask of pressed buttons
+            //     myGamepad->axisX(),       // (-511 - 512) left X Axis
+            //    myGamepad->axisY(),       // (-511 - 512) left Y axis
+            //     myGamepad->axisRX(),      // (-511 - 512) right X axis
+            //     myGamepad->axisRY(),      // (-511 - 512) right Y axis
+            //     myGamepad->brake(),       // (0 - 1023): brake button
+            //     myGamepad->throttle(),    // (0 - 1023): throttle (AKA gas) button
+            //     myGamepad->miscButtons()  // bitmak of pressed "misc" buttons
+            // );
 
             // You can query the axis and other properties as well. See Gamepad.h
             // For all the available functions.
