@@ -14,18 +14,6 @@
 //limitations under the License.
 //****************************************************************************/
 
-#include "sdkconfig.h"
-#ifndef CONFIG_BLUEPAD32_PLATFORM_ARDUINO
-#error "Must only be compiled when using Bluepad32 Arduino platform"
-#endif  // !CONFIG_BLUEPAD32_PLATFORM_ARDUINO
-
-#include <Arduino.h>
-#include <Bluepad32.h>
-
-#include <ESP32Servo.h>
-#include <ESP32SharpIR.h>
-#include <QTRSensors.h>
-
 //
 // README FIRST, README FIRST, README FIRST
 //
@@ -40,7 +28,56 @@
 // from "sdkconfig.defaults" with:
 //    CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE=n
 
+#include "sdkconfig.h"
+#ifndef CONFIG_BLUEPAD32_PLATFORM_ARDUINO
+#error "Must only be compiled when using Bluepad32 Arduino platform"
+#endif  // !CONFIG_BLUEPAD32_PLATFORM_ARDUINO
+
+#include <Arduino.h>
+#include <Bluepad32.h>
+
+#include <ESP32Servo.h>
+#include <ESP32SharpIR.h>
+#include <QTRSensors.h>
+
+//color sensor headers
+#include <Wire.h>
+#include <Arduino_APDS9960.h>
+#include <bits/stdc++.h>
+
+//color sensor definitions
+#define APDS9960_INT 5
+#define I2C_SDA 20
+#define I2C_SCL 21
+#define I2C_FREQ 100000
+
+//flash for comp
+#define ONBOARD_LED 2
+
+Servo servoLeft;
+Servo servoRight;
+
+
+//Color sensor unit & I2C unit
+TwoWire I2C_0 = TwoWire(0);
+APDS9960 apds = APDS9960(I2C_0, APDS9960_INT);
+
 GamepadPtr myGamepads[BP32_MAX_GAMEPADS];
+
+
+ESP32SharpIR left(ESP32SharpIR::GP2Y0A21YK0F, 25);
+ESP32SharpIR right(ESP32SharpIR::GP2Y0A21YK0F, 26);
+ESP32SharpIR straight(ESP32SharpIR::GP2Y0A21YK0F, 27);
+
+//change pin numebr to robot
+
+//int ServoRight = 23;
+//int ServoLeft = 24;
+//WHY DID I ADD THIS
+
+
+//change # based on sensor
+float testdist = 10;
 
 // This callback gets called any time a new gamepad is connected.
 // Up to 4 gamepads can be connected at the same time.
@@ -64,6 +101,8 @@ void onConnectedGamepad(GamepadPtr gp) {
     }
 }
 
+
+
 void onDisconnectedGamepad(GamepadPtr gp) {
     bool foundGamepad = false;
 
@@ -81,15 +120,23 @@ void onDisconnectedGamepad(GamepadPtr gp) {
     }
 }
 
-Servo servoLeft;
-Servo servoRight;
+void lineSensor(){
+//if blank pressed if while 
+}
 
-ESP32SharpIR sensor1( ESP32SharpIR::GP2Y0A21YK0F, 27);
-QTRSensors qtr;
+void mazeFollow(){
 
-const uint8_t SensorCount = 6;
-uint16_t sensorValues[SensorCount];
+}
 
+void colorSensor(){
+
+}
+
+//
+//
+//
+//
+//
 // Arduino setup function. Runs in CPU 1
 void setup() {
     // Console.printf("Firmware: %s\n", BP32.firmwareVersion());
@@ -104,37 +151,16 @@ void setup() {
     // But might also fix some connection / re-connection issues.
     BP32.forgetBluetoothKeys();
 
-    ESP32PWM::allocateTimer(0);
-	ESP32PWM::allocateTimer(1);
-	ESP32PWM::allocateTimer(2);
-	ESP32PWM::allocateTimer(3);
     servoLeft.setPeriodHertz(50);
     servoRight.setPeriodHertz(50);
-    servoLeft.attach(13, 1000, 2000);
-    servoRight.attach(14, 1000, 2000);
+    servoLeft.attach(23, 1000, 2000);
+    servoRight.attach(22, 1000, 2000);
 
-           // create an object for three QTR-xA sensors on analog inputs 0, 2, and 6
-    qtr.setTypeAnalog();
-    qtr.setSensorPins((const uint8_t[]){5, 17, 6}, 3);
-    //or 5,17,16,21,23,19,18, and change 3 to 8
-    //qtr.setEmitterPin(2);
     
     Serial.begin(115200);
 
-    
-    // Serial.begin(115200);
-    sensor1.setFilterRate(0.1f);
+ }
 
-    // qtr.setTypeRC(); // or setTypeAnalog()
-    // qtr.setSensorPins((const uint8_t[]) {12,13,14}, 3);
-     for (uint8_t i = 0; i < 250; i++)
-        {
-        Serial.println("calibrating");
-        qtr.calibrate();
-        delay(20);
-    }
-     qtr.calibrate();
-}
 
 // Arduino loop function. Runs in CPU 1
 void loop() {
@@ -176,9 +202,6 @@ void loop() {
             // For all the available functions.
         }
     }
-    // create an object for four QTR-xRC sensors on digital pins 0 and 9, and on analog
-// inputs 1 and 3 (which are being used as digital inputs 15 and 17 in this case)
-    qtr.read(sensorValues);
 
     BP32.update();
 
@@ -189,35 +212,7 @@ void loop() {
 
         if (myGamepad && myGamepad->isConnected()) {
 
-        for (uint8_t i = 0; i < SensorCount; i++)
-        {
-            Serial.print(sensorValues[i]);
-            Serial.print('\t');
-        }
 
-        Serial.println(sensor1.getDistanceFloat());
-
-        uint16_t sensors[3];
-        int16_t position = qtr.readLineBlack(sensors);
-        int16_t error = position - 1000;
-
-        if (error < 0)
-        {
-            Serial.println("On the left");
-            servoLeft.write(500);
-            servoRight.write(1000);
-        }
-        if (error > 0)
-        {
-            Serial.println("On the right");
-            servoLeft.write(1000);
-            servoRight.write(500);
-        }
-        if(error == 0){
-        Serial.println("Straight Ahead");  
-        servoLeft.write(1000);
-        servoRight.write(1000);
-        }
 
         }
     vTaskDelay(1);
