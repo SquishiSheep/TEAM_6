@@ -414,18 +414,23 @@ void loop() {
 
             if(!doingLineSensorTask && !doingColorSensorTask && !doingMazeFollowTask && !doingPizzaDeliveryTask){
                 if(myGamepad->a()){
+                    Serial.println("---A pressed---");
                     doingLineSensorTask = true;
                 }
                 else if(myGamepad->b()){
+                    Serial.println("---B pressed---");
                     doingColorSensorTask = true;
                 }
                 else if(myGamepad->y()){
+                    Serial.println("---Y pressed---");
                     doingMazeFollowTask = true;
                 }
                 else if(myGamepad->x()){
+                    Serial.println("---X pressed---");
                     doingPizzaDeliveryTask = true;
                 }
-                else{ //if no button pressed
+                else{ 
+
                     doingLineSensorTask = false;
                     doingColorSensorTask = false;
                     doingMazeFollowTask = false;
@@ -440,32 +445,34 @@ void loop() {
                 doingColorSensorTask = false;
                 doingMazeFollowTask = false;
                 doingPizzaDeliveryTask = false;
+                Serial.println("---thumbL pressed---");
             }
             
 
-            if (doingLineSensorTask){//line sensor task run in the loop 
+            if (doingLineSensorTask && !doingColorSensorTask && !doingMazeFollowTask && !doingPizzaDeliveryTask){//line sensor task run in the loop 
                 Serial.println("Line Time!!");
                 lineSensor();
             }
 
-            else if (doingColorSensorTask){//color sensor task
+            else if (!doingLineSensorTask && doingColorSensorTask && !doingMazeFollowTask && !doingPizzaDeliveryTask){//color sensor task
                 Serial.println("Color Time!!");
 
                 colorSensor();
             }
 
-            else if (doingMazeFollowTask){ //maze follow task
+            else if (!doingLineSensorTask && !doingColorSensorTask && doingMazeFollowTask && !doingPizzaDeliveryTask){ //maze follow task
                 Serial.println("Maze Time!!");
                 mazeFollow();
             }
 
-            else if (doingPizzaDeliveryTask){ //pizza delivery task
+            else if (!doingLineSensorTask && !doingColorSensorTask && !doingMazeFollowTask && doingPizzaDeliveryTask){ //pizza delivery task
                 Serial.println("Pizza Time!!");
                 delay(100);
                 //pizzaDelivery();
             }
 
             else{ //manual control
+                Serial.println("Manual Control!!");
                 servoLeft.write( ((((float) myGamepad->axisY()) / 512.0f) * 500) + 1500 );
                 servoRight.write( ((((float) myGamepad->axisRY()) / 512.0f) * 500) + 1500 );
             }
