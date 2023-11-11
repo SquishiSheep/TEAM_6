@@ -57,6 +57,11 @@
 Servo servoLeft;
 Servo servoRight;
 
+//autonomous task booleans
+bool doingLineSensorTask = false;
+bool doingColorSensorTask = false;
+bool doingMazeFollowTask = false;
+bool doingPizzaDeliveryTask = false;
 
 //Color sensor unit & I2C unit
 TwoWire I2C_0 = TwoWire(0);
@@ -156,7 +161,6 @@ void setup() {
     servoLeft.attach(23, 1000, 2000);
     servoRight.attach(22, 1000, 2000);
 
-    
     Serial.begin(115200);
 
  }
@@ -177,44 +181,83 @@ void loop() {
 
         if (myGamepad && myGamepad->isConnected()) {
 
-            servoLeft.write( ((((float) myGamepad->axisY()) / 512.0f) * 500) + 1500 );
-            servoRight.write( ((((float) myGamepad->axisRY()) / 512.0f) * 500) + 1500 );
+            if(!doingLineSensorTask && !doingColorSensorTask && !doingMazeFollowTask){
+                if(myGamepad->buttonPressed(BP32_BUTTON_A)){
+                    doingLineSensorTask = true;
+                }
+                else if(myGamepad->buttonPressed(BP32_BUTTON_B)){
+                    doingColorSensorTask = true;
+                }
+                else if(myGamepad->buttonPressed(BP32_BUTTON_Y)){
+                    doingMazeFollowTask = true;
+                }
+                else if(myGamepad->buttonPressed(BP32_BUTTON_X)){
+                    doingPizzaDeliveryTask = true;
+                }
+                else{
+                    doingLineSensorTask = false;
+                    doingColorSensorTask = false;
+                    doingMazeFollowTask = false;
+                    doingPizzaDeliveryTask = false;
+                    //do no autonomous task, allow for manual control
+                }
+                
+            }
+            
+
+            if doingLineSensorTask{//line sensor task run in the loop 
+                lineSensor();
+            }
+
+            else if doingColorSensorTask{//color sensor task
+                colorSensor();
+            }
+
+            else if doingMazeFollowTask{ //maze follow task
+                mazeFollow();
+            }
+
+            else if doingPizzaDeliveryTask{ //pizza delivery task
+                //pizzaDelivery();
+            }
+
+            else{ //manual control
+                servoLeft.write( ((((float) myGamepad->axisY()) / 512.0f) * 500) + 1500 );
+                servoRight.write( ((((float) myGamepad->axisRY()) / 512.0f) * 500) + 1500 );
+            }
+
+
+            
+            
+
+
 
             // Another way to query the buttons, is by calling buttons(), or
             // miscButtons() which return a bitmask.
             // Some gamepads also have DPAD, axis and more.
-            // Console.printf(
-            //     "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, "
-            //     "%4d, brake: %4d, throttle: %4d, misc: 0x%02x\n",
-            //     i,                        // Gamepad Index
-            //     myGamepad->dpad(),        // DPAD
-            //     myGamepad->buttons(),     // bitmask of pressed buttons
-            //     myGamepad->axisX(),       // (-511 - 512) left X Axis
-            //    myGamepad->axisY(),       // (-511 - 512) left Y axis
-            //     myGamepad->axisRX(),      // (-511 - 512) right X axis
-            //     myGamepad->axisRY(),      // (-511 - 512) right Y axis
-            //     myGamepad->brake(),       // (0 - 1023): brake button
-            //     myGamepad->throttle(),    // (0 - 1023): throttle (AKA gas) button
-            //     myGamepad->miscButtons()  // bitmak of pressed "misc" buttons
-            // );
+            Console.printf(
+                "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, "
+                "%4d, brake: %4d, throttle: %4d, misc: 0x%02x\n",
+                i,                        // Gamepad Index
+                myGamepad->dpad(),        // DPAD
+                myGamepad->buttons(),     // bitmask of pressed buttons
+                myGamepad->axisX(),       // (-511 - 512) left X Axis
+               myGamepad->axisY(),       // (-511 - 512) left Y axis
+                myGamepad->axisRX(),      // (-511 - 512) right X axis
+                myGamepad->axisRY(),      // (-511 - 512) right Y axis
+                myGamepad->brake(),       // (0 - 1023): brake button
+                myGamepad->throttle(),    // (0 - 1023): throttle (AKA gas) button
+                myGamepad->miscButtons()  // bitmak of pressed "misc" buttons
+            );
 
             // You can query the axis and other properties as well. See Gamepad.h
             // For all the available functions.
         }
     }
 
-    BP32.update();
-
-    // It is safe to always do this before using the gamepad API.
-    // This guarantees that the gamepad is valid and connected.
-    for (int i = 0; i < BP32_MAX_GAMEPADS; i++) {
-        GamepadPtr myGamepad = myGamepads[i];
-
-        if (myGamepad && myGamepad->isConnected()) {
 
 
 
-        }
     vTaskDelay(1);
     delay(100);
     }
