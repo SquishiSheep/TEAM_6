@@ -85,6 +85,7 @@ ESP32SharpIR straight(ESP32SharpIR::GP2Y0A21YK0F, 27);
 
 
 //change # based on sensor
+//
 float testdist = 10;
 
 // This callback gets called any time a new gamepad is connected.
@@ -129,6 +130,7 @@ void onDisconnectedGamepad(GamepadPtr gp) {
 }
 
 void lineSensor(){
+
 //if blank pressed if while 
  uint16_t sensors[8];
     position = abs(7000-qtr.readLineBlack(sensors));
@@ -326,6 +328,7 @@ void mazeFollow(){
     float right_dist = right.getDistanceFloat();
     float straight_dist = straight.getDistanceFloat();
     
+    Serial.println(left_dist, straight_dist, right_dist);
 
 //straight path
 
@@ -369,7 +372,14 @@ void mazeFollow(){
     }
 }
 
-
+void pizzaDelivery(){
+    servoLeft.write(2000);
+    servoRight.write(2000);
+    delay(4000);
+    servoDump.write(90));
+    delay(3000);
+    servoDump.write(0));
+}
 
 //
 //
@@ -399,8 +409,11 @@ void setup() {
 
     servoLeft.setPeriodHertz(50);
     servoRight.setPeriodHertz(50);
+    servoDump.setPeriodHertz(50);
     servoLeft.attach(23, 1000, 2000);
     servoRight.attach(5, 1000, 2000);
+    servoDump.attach(16, 544, 2400);
+    servoDump.write(0);
 
     //sets up I2C protocol
     I2C_0.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
@@ -517,7 +530,7 @@ void loop() {
             else if (!doingLineSensorTask && !doingColorSensorTask && !doingMazeFollowTask && doingPizzaDeliveryTask){ //pizza delivery task
                 Serial.println("Pizza Time!!");
                 delay(100);
-                //pizzaDelivery();
+                pizzaDelivery();
             }
 
             else{ //manual control
