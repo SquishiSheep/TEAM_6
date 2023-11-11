@@ -413,19 +413,19 @@ void loop() {
         if (myGamepad && myGamepad->isConnected()) {
 
             if(!doingLineSensorTask && !doingColorSensorTask && !doingMazeFollowTask){
-                if(myGamepad->buttonPressed(BP32_BUTTON_A)){
+                if(myGamepad->buttonPressed(BTN_A)){
                     doingLineSensorTask = true;
                 }
-                else if(myGamepad->buttonPressed(BP32_BUTTON_B)){
+                else if(myGamepad->buttonPressed(BTN_B)){
                     doingColorSensorTask = true;
                 }
-                else if(myGamepad->buttonPressed(BP32_BUTTON_Y)){
+                else if(myGamepad->buttonPressed(BTN_Y)){
                     doingMazeFollowTask = true;
                 }
-                else if(myGamepad->buttonPressed(BP32_BUTTON_X)){
+                else if(myGamepad->buttonPressed(BTN_X)){
                     doingPizzaDeliveryTask = true;
                 }
-                else{
+                else{ //if no button pressed
                     doingLineSensorTask = false;
                     doingColorSensorTask = false;
                     doingMazeFollowTask = false;
@@ -434,21 +434,28 @@ void loop() {
                 }
                 
             }
+            if (myGamepad->buttonPressed(BTN_BACK))
+            { //if back/select button pressed, stop autonomous task, allow for manual control
+                doingLineSensorTask = false;
+                doingColorSensorTask = false;
+                doingMazeFollowTask = false;
+                doingPizzaDeliveryTask = false;
+            }
             
 
-            if doingLineSensorTask{//line sensor task run in the loop 
+            if (doingLineSensorTask){//line sensor task run in the loop 
                 lineSensor();
             }
 
-            else if doingColorSensorTask{//color sensor task
+            else if (doingColorSensorTask){//color sensor task
                 colorSensor();
             }
 
-            else if doingMazeFollowTask{ //maze follow task
+            else if (doingMazeFollowTask){ //maze follow task
                 mazeFollow();
             }
 
-            else if doingPizzaDeliveryTask{ //pizza delivery task
+            else if (doingPizzaDeliveryTask){ //pizza delivery task
                 //pizzaDelivery();
             }
 
@@ -493,5 +500,3 @@ void loop() {
     delay(100);
     }
 }
-//fidjufs
-//follow the line
